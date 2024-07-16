@@ -1,0 +1,21 @@
+with monthlyrevenue as(
+    SELECT p.productname, date_trunc('month',s.orderdate)::DATE as months, SUM(s.revenue) as total_revenue
+    FROM products as p
+    JOIN subscriptions as s ON p.productid = s.productid
+    WHERE YEAR(s.orderdate) = 2022
+    GROUP BY p.PRODUCTNAME, date_trunc('month',s.orderdate)::DATE
+)
+
+SELECT
+    PRODUCTNAME, MIN(TOTAL_REVENUE) as MIN_REV, MAX(TOTAL_REVENUE) as MAX_REV, avg(TOTAL_REVENUE) as AVG_REV, stddev(TOTAL_REVENUE) as STD_DEV_REV 
+FROM monthlyrevenue
+GROUP BY PRODUCTNAME
+
+Correct output
+2 rows
+------------------------------------------------------------------
+| PRODUCTNAME | MIN_REV | MAX_REV | AVG_REV | STD_DEV_REV        |
+------------------------------------------------------------------
+| Basic       | 500     | 28000   | 13188   | 8123.763642197237  |
+| Expert      | 3000    | 46000   | 18000   | 13796.134724383252 |
+------------------------------------------------------------------
