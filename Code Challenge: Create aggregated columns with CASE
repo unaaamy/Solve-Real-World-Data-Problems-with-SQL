@@ -1,0 +1,18 @@
+select
+    e.userid,
+    sum(case when e.eventid = 1 then 1 else 0 end) as ViewedHelpCenterPage,
+    sum(case when e.eventid = 2 then 1 else 0 end) as ClickedFAQs,
+    sum(case when e.eventid = 3 then 1 else 0 end) as ClickedContactSupport,
+    sum(case when e.eventid = 4 then 1 else 0 end) as SubmittedTicket
+from frontendeventlog e left join frontendeventdefinitions d on d.EVENTID = e.EVENTID
+where d.EVENTTYPE = 'Customer Support'
+group by userid
+
+Correct output
+2 rows
+-----------------------------------------------------------------------------------------
+| USERID | VIEWEDHELPCENTERPAGE | CLICKEDFAQS | CLICKEDCONTACTSUPPORT | SUBMITTEDTICKET |
+-----------------------------------------------------------------------------------------
+| U172   | 1                    | 0           | 1                     | 1               |
+| U837   | 4                    | 1           | 2                     | 2               |
+-----------------------------------------------------------------------------------------
