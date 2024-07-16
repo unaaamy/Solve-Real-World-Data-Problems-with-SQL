@@ -1,9 +1,9 @@
 with all_cancelation_reasons as(
 
 select subscriptionid, cancelationreason1 as cancelationreason from cancelations
-union all
+union
 select subscriptionid, cancelationreason2 as cancelationreason from cancelations
-union all
+union
 select subscriptionid, cancelationreason3 as cancelationreason from cancelations
 
 )
