@@ -4,7 +4,7 @@ with max as (
 	group by subscriptionid
 )
 
-SELECT count(s.SUBSCRIPTIONID) as subscriptions,
+SELECT
 case when maxstatus = 1 then 'PaymentWidgetOpened'
 		when m.maxstatus = 2 then 'PaymentEntered'
 		when m.maxstatus = 3 and currentstatus = 0 then 'User Error with Payment Submission'
@@ -13,21 +13,22 @@ case when maxstatus = 1 then 'PaymentWidgetOpened'
 		when m.maxstatus = 4 and currentstatus != 0 then 'Payment Success'
 		when m.maxstatus = 5 then 'Complete'
 		when m.maxstatus is null then 'User did not start payment process'
-		end as paymentfunnelstage
+		end as paymentfunnelstage,
+		count(s.SUBSCRIPTIONID) as subscriptions
 from subscriptions s LEFT JOIN max m on m.subscriptionid = s.subscriptionid
 group by paymentfunnelstage
 
 Correct output
 8 rows
 --------------------------------------------------------
-| SUBSCRIPTIONS | PAYMENTFUNNELSTAGE                   |
+| PAYMENTFUNNELSTAGE                   | SUBSCRIPTIONS |
 --------------------------------------------------------
-| 12            | Complete                             |
-| 1             | Payment Processing Error with Vendor |
-| 1             | Payment Submitted                    |
-| 1             | Payment Success                      |
-| 2             | PaymentEntered                       |
-| 7             | PaymentWidgetOpened                  |
-| 1             | User Error with Payment Submission   |
-| 3             | User did not start payment process   |
+| Complete                             | 12            |
+| Payment Processing Error with Vendor | 1             |
+| Payment Submitted                    | 1             |
+| Payment Success                      | 1             |
+| PaymentEntered                       | 2             |
+| PaymentWidgetOpened                  | 7             |
+| User Error with Payment Submission   | 1             |
+| User did not start payment process   | 3             |
 --------------------------------------------------------
