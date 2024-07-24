@@ -1,0 +1,22 @@
+select 
+    employees.employeeid,
+    employees.name employee_name,
+    manager.name manager_name,
+    coalesce(manager.EMAIL, employees.EMAIL) as contact_email
+from employees
+left join employees manager
+on employees.MANAGERID = manager.employeeid
+where employees.department = 'Sales'
+
+-- coalesce() returns the first non-null value, it will use the manager email first. If that's null, then it'll use the employee email. If both values are null, the default for coalesce is to return null.
+
+Correct output
+4 rows
+----------------------------------------------------------------------
+| EMPLOYEEID | EMPLOYEE_NAME | MANAGER_NAME | CONTACT_EMAIL          |
+----------------------------------------------------------------------
+| E738       | Joe Burns     | Bonnie Clark | bclark6@bing.com       |
+| E429       | Bonnie Clark  | null         | bclark6@bing.com       |
+| E192       | Lori Fields   | Bonnie Clark | bclark6@bing.com       |
+| E172       | Roy Martin    | null         | rmarting@delicious.com |
+----------------------------------------------------------------------
