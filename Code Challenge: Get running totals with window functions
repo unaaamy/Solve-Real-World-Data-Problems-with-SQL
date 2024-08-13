@@ -1,0 +1,42 @@
+-- SQL request(s)​​​​​​‌​‌‌‌​​‌​​​​‌​​‌​​‌​‌​‌‌‌ below
+with salesjoin as (
+select *
+from sales
+join employees
+on sales.SALESEMPLOYEEID = employees.EMPLOYEEID
+)
+
+select
+    salesemployeeid,
+    saledate,
+    saleamount,
+    sum(saleamount) over(partition by employeeid order by saledate) as running_total,
+    cast(sum(saleamount) over(partition by employeeid order by saledate) as float)/quota as percent_quota
+from
+    salesjoin;
+
+--- sales table: saleid, salesemployeeid, saledate, saleamount
+--- employees table: employeeid, name, email, department, quota, managerid
+
+Correct output
+16 rows
+-----------------------------------------------------------------------------------
+| SALESEMPLOYEEID | SALEDATE   | SALEAMOUNT | RUNNING_TOTAL | PERCENT_QUOTA       |
+-----------------------------------------------------------------------------------
+| E738            | 2023-01-04 | 18000      | 18000         | 0.36                |
+| E738            | 2023-03-18 | 10000      | 28000         | 0.56                |
+| E738            | 2023-07-16 | 12000      | 46000         | 0.92                |
+| E738            | 2023-03-26 | 5000       | 33000         | 0.66                |
+| E738            | 2023-04-16 | 1000       | 34000         | 0.68                |
+| E738            | 2023-07-28 | 11000      | 57000         | 1.14                |
+| E429            | 2023-01-30 | 4000       | 4000          | 0.05                |
+| E429            | 2023-04-03 | 7000       | 11000         | 0.1375              |
+| E429            | 2023-07-13 | 10000      | 21000         | 0.2625              |
+| E192            | 2023-02-09 | 14000      | 14000         | 0.23333333333333334 |
+| E192            | 2023-03-14 | 9000       | 23000         | 0.38333333333333336 |
+| E192            | 2023-05-16 | 16000      | 39000         | 0.65                |
+| E172            | 2023-03-11 | 9000       | 9000          | 0.18                |
+| E172            | 2023-06-11 | 11000      | 20000         | 0.4                 |
+| E172            | 2023-06-15 | 15000      | 35000         | 0.7                 |
+| E172            | 2023-07-17 | 3000       | 38000         | 0.76                |
+-----------------------------------------------------------------------------------
