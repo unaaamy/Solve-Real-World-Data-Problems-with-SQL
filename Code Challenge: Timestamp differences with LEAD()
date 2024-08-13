@@ -1,0 +1,69 @@
+/*
+Question:
+A customer has complained that it took too long for them to complete their payment process due to there being an error with the system. The customer support team brought this issue up and asked the analytics team to investigate the payment funnel time data for subscriptionid = 38844.
+
+As subscriptions move through the payment statuses, they are logged in the paymentstatuslog table using the statusid to show what status they moved to. They can go back and forth and move through statuses multiple times.
+
+Each step of the payment process from the user point of view is outlined below:
+1. The user opens the widget to initiate the payment process.
+2. The user types in their credit card information.
+3. The user clicks the "submit" button to complete their part of the payment process.
+4. The product sends the data to the third-party payment company.
+5. The third-party payment company completes the transaction and reports back.
+
+This process is converted into **statusids** using the following ID to definition mapping below:
+
+select * from statusdefinition;
+
+| STATUSID | DESCRIPTION            |
+|----------|------------------------|
+| 0        | Error                  |
+| 1        | PaymentWidgetOpened    |
+| 2        | PaymentEntered         |
+| 3        | PaymentSubmitted       |
+| 4        | PaymentSuccess         |
+| 5        | Complete               |
+
+---
+
+Task:
+Using the paymentstatuslog table, pull payment funnel data for subscriptionid = 38844. For each status timestamp, calculate the time difference between that timestamp and the next chronological timestamp in order to show how long the user was in each status before moving to the next status. You can use the window function lead() to pull the next chronological timestamp.
+
+Include the following columns:
+- SubscriptionMovementid
+- Subscriptionid
+- Statusid
+- MovementDate
+- NextStatusMovementDate
+- TimeInStatus
+*/
+------------------------------------------------
+Solution:
+------------------------------------------------
+
+-- SQL request(s)​​​​​​‌​‌‌‌​​‌​​​​‌​​‌​‌‌‌​‌​‌‌ below
+
+select
+    statusmovementid,
+    subscriptionid,
+    statusid,
+    movementdate,
+    lead(MOVEMENTDATE, 1) over(partition by subscriptionid order by movementdate) as nextstatusmovementdate,
+    lead(MOVEMENTDATE, 1) over(partition by subscriptionid order by movementdate) - movementdate as timeinstatus
+from paymentstatuslog
+where subscriptionid = '38844'
+
+Correct output
+8 rows
+---------------------------------------------------------------------------------------------------------------------------------------
+| STATUSMOVEMENTID | SUBSCRIPTIONID | STATUSID | MOVEMENTDATE          | NEXTSTATUSMOVEMENTDATE | TIMEINSTATUS                        |
+---------------------------------------------------------------------------------------------------------------------------------------
+| 39112775         | 38844          | 1        | 2023-12-02 02:33:13.0 | 2023-12-02 02:33:22.0  | INTERVAL '0 00:00:09' DAY TO SECOND |
+| 13223956         | 38844          | 2        | 2023-12-02 02:33:22.0 | 2023-12-02 02:33:29.0  | INTERVAL '0 00:00:07' DAY TO SECOND |
+| 53176031         | 38844          | 3        | 2023-12-02 02:33:29.0 | 2023-12-02 02:33:31.0  | INTERVAL '0 00:00:02' DAY TO SECOND |
+| 1694206          | 38844          | 0        | 2023-12-02 02:33:31.0 | 2023-12-02 02:33:46.0  | INTERVAL '0 00:00:15' DAY TO SECOND |
+| 59634923         | 38844          | 2        | 2023-12-02 02:33:46.0 | 2023-12-02 02:33:51.0  | INTERVAL '0 00:00:05' DAY TO SECOND |
+| 31401200         | 38844          | 3        | 2023-12-02 02:33:51.0 | 2023-12-02 02:33:53.0  | INTERVAL '0 00:00:02' DAY TO SECOND |
+| 94425726         | 38844          | 4        | 2023-12-02 02:33:53.0 | 2023-12-02 02:33:55.0  | INTERVAL '0 00:00:02' DAY TO SECOND |
+| 78460513         | 38844          | 5        | 2023-12-02 02:33:55.0 | null                   | null                                |
+---------------------------------------------------------------------------------------------------------------------------------------
