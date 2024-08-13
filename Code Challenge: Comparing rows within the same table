@@ -22,3 +22,12 @@ where
     current.monthly_revenue > previous.monthly_revenue
 and
     datediff('month', previous.order_month, current.order_month) = 1
+
+Correct output
+2 rows
+-----------------------------------------------------------------------
+| CURRENT_MONTH | PREVIOUS_MONTH | CURRENT_REVENUE | PREVIOUS_REVENUE |
+-----------------------------------------------------------------------
+| 2022-07-01    | 2022-06-01     | 63000           | 31000            |
+| 2022-10-01    | 2022-09-01     | 27000           | 26000            |
+-----------------------------------------------------------------------
